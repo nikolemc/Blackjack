@@ -13,10 +13,9 @@ namespace Blackjack
         static Card[] dealersHand, playersHand;
         static int numberOfCards = 52;
         static int playerScore = 0, dealerScore = 0, dealerShowingScore = 0;
-        static bool playing, bust;
+        static bool playing, dealerDrawing, playerDrawing;
         static int currentCard = 0;
         static int counter = 0;
-        static bool initialDeal = true;
         static bool player, dealer;
         string gameStatus;
        
@@ -29,8 +28,10 @@ namespace Blackjack
             FillDeck();
             ShuffleDeck();
             FirstDealFromDeck();
-            CompareDealerTotalValueWithPlayerTotalValue();
-            PlayerContinuesPlayingGame();
+            CompareScoresAfterInitialDeal();
+            PlayerDrawsCards();
+            DealerDrawsCards();
+            DetermineOutcome();
 
 
             Console.ReadLine();
@@ -102,7 +103,7 @@ namespace Blackjack
         }
 
 
-        public static void CompareDealerTotalValueWithPlayerTotalValue()
+        public static void CompareScoresAfterInitialDeal()
         {
 
             playerScore = ConvertHandofCardsTotalValue(playersHand);
@@ -110,55 +111,39 @@ namespace Blackjack
             dealerShowingScore = dealersHand[0].GetCardValue(); //Get the value of the dealers first card only
             Console.WriteLine($"Your current score is {playerScore}");
             
-            if (initialDeal & playerScore == 21 & dealerScore == 21)
+            if (playerScore == 21 & dealerScore == 21)
             {
-                Console.WriteLine("Dealer's hand: ", dealersHand);
                 Console.WriteLine("It's a draw. No one wins.");
-                //GameStatus("draw");
+                playing = false;
             }
 
-            else if (initialDeal & playerScore == 21)
+            else if (playerScore == 21)
             {
                Console.WriteLine("BlackJack! You win.");
-               Console.WriteLine();
-               
+               playing = false;
             }
             
-            else if (initialDeal & (!(playerScore == 21) & !(dealerScore == 21)) || (!(playerScore == 21) & dealerScore == 21))
+            else if ((!(playerScore == 21) & !(dealerScore == 21)) || (!(playerScore == 21) & dealerScore == 21))
             {
                 Console.WriteLine("Dealer is showing:");
                 Console.WriteLine($"{dealersHand[0]} ({dealerShowingScore})"); //Show only the first card of the Dealers hand using [0]
 
             }
-            initialDeal = false;   //this is true the first time is runs through- then will switch to false on 2nd loop and all thereafter
+            
         }
 
-        public static void PlayerContinuesPlayingGame()
+        public static void PlayerDrawsCards()
         {
 
             do //do while loop for status "playing"
             {
                 Console.WriteLine("Do you want anothter Card? (Y/N)");
-                playing = Console.ReadLine().ToString().ToLower() == "y";
+                playerDrawing = Console.ReadLine().ToString().ToLower() == "y";
 
-                if (playing)
+                if (playerDrawing)
                 {
                     playersHand = playersHand.Concat(DealCards(1)).ToArray(); //deal another card to player
                     playerScore = ConvertHandofCardsTotalValue(playersHand);  //update players hand total score value.
-
-                    if (playerScore > 21)
-                    {
-                        Console.WriteLine("Sorry you are bust!");
-                        Console.WriteLine($"Your total score is {playerScore}");
-                        playing = false;
-
-                    }
-
-                    else if (playerScore == 21 & !(dealerScore == 21))
-                    {
-                        Console.WriteLine("You win.");
-                        playing = false;
-                    }
 
                     Console.WriteLine("Your cards are:");
 
@@ -167,20 +152,95 @@ namespace Blackjack
                         Console.WriteLine(dealCard);
 
                     }
+                    Console.WriteLine($"Your total score is {playerScore}");
 
-                    if (playerScore < 21)
+                    if (playerScore > 21)
                     {
-                        Console.WriteLine($"Your current score is {playerScore}");
+                        Console.WriteLine("Sorry you are bust!");
+                        playerDrawing = false;
+                        playing = false;
+
                     }
 
+                    else if (playerScore == 21 & !(dealerScore == 21))
+                    {
+                        Console.WriteLine("You win.");
+                        playerDrawing = false;
+                        playing = false;
+                    }
+                                      
+
+                    
                 }
 
             }
-            while (playing);
+            while (playerDrawing);
+
+        
         }
 
+        public static void DealerDrawsCards()
+        {
+            dealerDrawing = true;
+            if (playing)
+            {
+
+                do
+                {
+                    dealersHand = dealersHand.Concat(DealCards(1)).ToArray(); //deal another card to dealer
+                    dealerScore = ConvertHandofCardsTotalValue(dealersHand);  //update dealers hand total score value.
+
+                    if (dealerScore > 16)
+                    {
+                        dealerDrawing = false; 
+                    }
+
+                } while (dealerDrawing);
+            }
+        }
+
+        public static void DetermineOutcome()
+        {
+            if (playing)
+            {
+                //logic for who wins
+
+                if (playerScore ==  dealerScore)
+                {
+                    Console.WriteLine("It's a draw. No one wins.");
+                  
+                }
+
+                else if (dealerScore > 21)
+                {
+                    Console.WriteLine("Dealer Bust! You win.");
+                   
+                }
+
+                else if (playerScore > dealerScore)
+                {
+                    Console.WriteLine("You Win!");
+                 
+                }
+
+                else
+                {
+                    Console.WriteLine("You Lose");
+                }
+            }
+
+            
+                Console.WriteLine("The dealers cards were:");
+
+                foreach (var dealCard in dealersHand)
+                {
+                    Console.WriteLine(dealCard);
+
+                }
+                Console.WriteLine($"Dealers score was {dealerScore}");
 
 
+        }
 
 
     }
