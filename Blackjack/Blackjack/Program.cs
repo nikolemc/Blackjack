@@ -5,54 +5,86 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Blackjack
+
 {
-    //Level 1: Create a playable blackjack game with one human player and one computer dealer
-
-    //How to Play Black Jack:
-    //1.	Start a new game
-    //2.	Deal two cards to both players
-    //3.	Ask players with the status "playing" if they want another card: if someone does, give them another card; if someone doesn't, change their status to "stay"
-    //4.	Repeat step 3 while there are players with "playing" status
-    //5.	Compare players' hands to declare winner and loser. Update player statistics
-
-    //     Game Classes:
-    //     PlayerStatus class: wrapper class for player; data such as current player's hand and current status are stored 
-    //     Game Class: Blackjack game Logic 
-    //     Main
-
-    //     GAME METHODS
-    //     StartGame
-    //     PlayerTurn
-    //     GiveCardToPlayer
-    //     EndRound
-
-    //     ENUMS & CLASSES
-    //     Suit: Hearts, Clubs, Diamonds, Spades
-    //     Rank: Ace(11), Deuce, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King
-    //     Card: 
-
-
-
-
     class Program
     {
-
+        static List<Card> deck = new List<Card>();
+        static Card[] dealersHand, playersHand;
+        static int numberOfCards = 52;
+        static int playerScore = 0, dealerScore = 0;
+        static bool playing, bust;
+        static bool playerWin, dealerWin;
+        static int currentCard = 0;
+        static int counter = 0;
         
         static void Main(string[] args)
         {
-            int playerScore, dealerScore;
-            bool playing, bust;
-            int numberOfCards = 52;
-            int currentCard;
-            int counter = 0;
+            GameGreeting();
+            FillDeck();
+            ShuffleDeck();
+             FirstDealFromDeck();
 
-            // / Game Greeting & Start Game
+
+
+            //Console.WriteLine(randomDeck[1]);
+
+            foreach (var dealCard in playersHand)
+            {
+                Console.WriteLine(dealCard);
+            }
+
+            foreach (var dealCard in dealersHand)
+            {
+                Console.WriteLine(dealCard);
+            }
+            //Console.WriteLine((int)dealersHand[1].Rank);
+            //Console.WriteLine((int)dealersHand[2].Rank);
+            //Console.WriteLine((int)dealersHand[1].Rank + (int)dealersHand[2].Rank);
+
+            
+            //Console.WriteLine((int)playersHand[1].Rank);
+            //Console.WriteLine((int)playersHand[2].Rank);
+            //Console.WriteLine((int)playersHand[1].Rank + (int)playersHand[2].Rank);
+
+            //Console.WriteLine((int)deck[0].Rank);
+            //Console.WriteLine((int)deck[1].Rank);
+            //Console.WriteLine((int)deck[0].Rank + (int)deck[1].Rank);
+
+            //foreach (var dealCard in deck)
+            //{
+            //    Console.WriteLine(dealCard);
+            //    Console.WriteLine(dealCard.Rank);
+            //    Console.WriteLine((int)dealCard.Rank);
+            //}
+
+            playerScore = ConvertHandofCardsTotalValue(playersHand);
+            Console.WriteLine(playerScore);
+
+            dealerScore = ConvertHandofCardsTotalValue(dealersHand);
+            Console.WriteLine(dealerScore);
+
+
+
+            //foreach (var dealCard in deck)
+            //{
+            //    Console.WriteLine(dealCard);
+            //}
+
+            Console.ReadLine();
+
+        }
+
+
+        static void GameGreeting()
+        {
+            //Game Greeting & Start Game
             Console.WriteLine("Welcome to McStanley's Black Jack. Would you like to play Black Jack? \nY/N");
-            playing = Console.ReadKey().ToString().ToLower() == "y";
+            playing = Console.ReadLine().ToString().ToLower() == "y";
+        }
 
-            //New Deck)
-            var deck = new List<Card>();
-
+        static void FillDeck()
+        {
             foreach (Rank r in Enum.GetValues(typeof(Rank)))
             {
                 foreach (Suits s in Enum.GetValues(typeof(Suits)))
@@ -61,19 +93,43 @@ namespace Blackjack
                 }
             }
 
-            //this is deck shuffled
-            //sort the deck. NOTICE that the variable 'deck' is unchanged, but 'randomDeck' is the actual sorted deck.
-            var randomDeck = deck.OrderBy(x => Guid.NewGuid()).ToList();
+        }
 
-            //Check all cards are there and go to output
-            foreach (var dealCard in randomDeck)
-            {
+        static void ShuffleDeck()
+        {
+            
+            deck = deck.OrderBy(x => Guid.NewGuid()).ToList();
+        }
 
-                Console.WriteLine(dealCard);
-            }
+        static Card[] DealCards(int numOfCardsToDeal)
+        {
+            var chosenCards = deck.Take(numOfCardsToDeal).ToArray(); // chooses cards from deck
+            deck = deck.Except(chosenCards).ToList(); // removes dealt cards from deck
+            return chosenCards;
+        }
 
-            Console.ReadLine();
+
+        static void FirstDealFromDeck()
+        {
+            dealersHand = DealCards(2);
+            playersHand = DealCards(2);
+
+            // dealerScore = dealersHand.Sum(c => Card.First(v => val(c) > 0 ? val(c).ToString() == v.cardName : c.StartsWith(v.cardName)).cardValue);
+            //playerScore = playersHand.Sum(c => values.First(v => val(c) > 0 ? val(c).ToString() == v.cardName : c.StartsWith(v.cardName)).cardValue);
 
         }
+
+        public static int ConvertHandofCardsTotalValue(Card[] listToConvert)
+        {
+            var TotalValueofHand = 0;
+
+                foreach (var CardIterate in listToConvert)
+            {
+                TotalValueofHand += CardIterate.GetCardValue();
+            }
+            return TotalValueofHand;
+        }
     }
+
+
 }

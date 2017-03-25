@@ -17,7 +17,7 @@ namespace Blackjack
             this.Rank = r;
         }
 
-        public int GetCardValue()
+        public int GetCardValue() //this is the method that will convert anything with the property card to and int. this is like parsing card into int.
         {
             var rv = 0;
             switch (this.Rank)
@@ -69,6 +69,9 @@ namespace Blackjack
         public override string ToString()
         {
             return $"The {this.Rank} of {this.Suit}";
+           // return string.Format("Suit: {0}, Value: {1}", this.Suit, this.Rank);
         }
+
+       
     }
 }
