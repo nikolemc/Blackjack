@@ -12,65 +12,22 @@ namespace Blackjack
         static List<Card> deck = new List<Card>();
         static Card[] dealersHand, playersHand;
         static int numberOfCards = 52;
-        static int playerScore = 0, dealerScore = 0;
+        static int playerScore = 0, dealerScore = 0, dealerShowingScore = 0;
         static bool playing, bust;
         static bool playerWin, dealerWin;
         static int currentCard = 0;
         static int counter = 0;
+        static bool initialDeal = true;
         
+
         static void Main(string[] args)
         {
             GameGreeting();
             FillDeck();
             ShuffleDeck();
-             FirstDealFromDeck();
-
-
-
-            //Console.WriteLine(randomDeck[1]);
-
-            foreach (var dealCard in playersHand)
-            {
-                Console.WriteLine(dealCard);
-            }
-
-            foreach (var dealCard in dealersHand)
-            {
-                Console.WriteLine(dealCard);
-            }
-            //Console.WriteLine((int)dealersHand[1].Rank);
-            //Console.WriteLine((int)dealersHand[2].Rank);
-            //Console.WriteLine((int)dealersHand[1].Rank + (int)dealersHand[2].Rank);
-
+            FirstDealFromDeck();
+            CompareDealerTotalValueWithPlayerTotalValue();
             
-            //Console.WriteLine((int)playersHand[1].Rank);
-            //Console.WriteLine((int)playersHand[2].Rank);
-            //Console.WriteLine((int)playersHand[1].Rank + (int)playersHand[2].Rank);
-
-            //Console.WriteLine((int)deck[0].Rank);
-            //Console.WriteLine((int)deck[1].Rank);
-            //Console.WriteLine((int)deck[0].Rank + (int)deck[1].Rank);
-
-            //foreach (var dealCard in deck)
-            //{
-            //    Console.WriteLine(dealCard);
-            //    Console.WriteLine(dealCard.Rank);
-            //    Console.WriteLine((int)dealCard.Rank);
-            //}
-
-            playerScore = ConvertHandofCardsTotalValue(playersHand);
-            Console.WriteLine(playerScore);
-
-            dealerScore = ConvertHandofCardsTotalValue(dealersHand);
-            Console.WriteLine(dealerScore);
-
-
-
-            //foreach (var dealCard in deck)
-            //{
-            //    Console.WriteLine(dealCard);
-            //}
-
             Console.ReadLine();
 
         }
@@ -97,7 +54,7 @@ namespace Blackjack
 
         static void ShuffleDeck()
         {
-            
+
             deck = deck.OrderBy(x => Guid.NewGuid()).ToList();
         }
 
@@ -106,6 +63,7 @@ namespace Blackjack
             var chosenCards = deck.Take(numOfCardsToDeal).ToArray(); // chooses cards from deck
             deck = deck.Except(chosenCards).ToList(); // removes dealt cards from deck
             return chosenCards;
+
         }
 
 
@@ -114,21 +72,63 @@ namespace Blackjack
             dealersHand = DealCards(2);
             playersHand = DealCards(2);
 
-            // dealerScore = dealersHand.Sum(c => Card.First(v => val(c) > 0 ? val(c).ToString() == v.cardName : c.StartsWith(v.cardName)).cardValue);
-            //playerScore = playersHand.Sum(c => values.First(v => val(c) > 0 ? val(c).ToString() == v.cardName : c.StartsWith(v.cardName)).cardValue);
+            Console.WriteLine("Your cards are:");
 
+            foreach (var dealCard in playersHand)
+            {
+                 Console.WriteLine(dealCard);
+                
+            }
+                               
         }
 
         public static int ConvertHandofCardsTotalValue(Card[] listToConvert)
         {
             var TotalValueofHand = 0;
 
-                foreach (var CardIterate in listToConvert)
+            foreach (var CardIterate in listToConvert)
             {
                 TotalValueofHand += CardIterate.GetCardValue();
             }
             return TotalValueofHand;
+
         }
+
+
+        public static void CompareDealerTotalValueWithPlayerTotalValue()
+        {
+
+            playerScore = ConvertHandofCardsTotalValue(playersHand);
+            dealerScore = ConvertHandofCardsTotalValue(dealersHand);
+            dealerShowingScore = dealersHand[1].GetCardValue();
+            Console.WriteLine($"Your current score is {playerScore}");
+            
+            if (initialDeal & playerScore == 21 & dealerScore == 21)
+            {
+                Console.WriteLine("Dealer's hand: ", dealersHand);
+                Console.WriteLine("It's a draw. No one wins.");
+                //updateStats("draw");
+            }
+
+            else if (initialDeal & playerScore == 21)
+            {
+               Console.WriteLine("BlackJack! You win.");
+               Console.WriteLine();
+               //updateStats("user");
+
+            }
+            
+            else if (initialDeal & (!(playerScore == 21) & !(dealerScore == 21)) || (!(playerScore == 21) & dealerScore == 21))
+            {
+                Console.WriteLine("Dealer is showing:");
+                Console.WriteLine($"{dealersHand[1]} ({dealerShowingScore})");
+                
+                Console.WriteLine("Lets Continue");
+            }
+            initialDeal = false;   //this is true the first time is runs through- then will switch to false on 2nd loop and all thereafter
+        }
+
+
     }
 
 
